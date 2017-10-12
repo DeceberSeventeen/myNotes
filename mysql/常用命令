@@ -1,0 +1,143 @@
+1、mysql -h localhost -u root -p test
+   以root用户登录test@localhost数据库
+2、mysql -uroot padmin
+   以root用户密码admin登录localhost服务器
+3、status
+   查看mysql当前信息
+4、show user()
+   显示当前用户名
+5、mysql中的时间显示
+    select current_time();     --只显示当前时间
+    select current_date();     --只显示当前日期
+    select current_timestamp();    --显示当前的时间和日期
+6、mysql中查看数据库信息
+    show databases;    --列出所有的数据库模式
+    select database(); --查看当前使用的数据库模式
+    use database_schema   --切换到指定的数据库模式
+7、查看表信息
+    show tables;        --列出当前模式中的数据表
+    desc tableName;     --查看表结构
+8、create database DBName;  
+  --创建数据库模式DBName
+9、drop databse DBName;      
+    --删除数据库模式DBName
+10、alter database DBName character set utf8;   
+    --修改数据库DBName的编码方式
+11、mysql脚本中的注释
+    单行注释： --comments
+    多行注释： /*comments*/
+12、创建表
+	create table if exists tb_test
+	(
+	  id int primary key auto_increment,  --创建int类型的主键，且自增长
+	  name varchar(255) not null,   --创建字符类型的列，最大长度为255字节
+	  salary float(11,2),    --创建小数类型的列，小数点后两位
+	  birthday date,     --创建日期类型的字段，只保存日期
+	  sleep time,       --创建时间类型的字段 ，只保存时间
+	  ts timestamp,     --创建时间戳类型的列，保存日期和时间
+	  description text,    --创建大文本类型数据的列，保存大文本，长度不受限制
+ 	  picture blob     --创建二进制类型的列，保存二进制数据
+	);
+
+    创建临时表   --临时表是指创建后只在当前连接内有效，断开与数据库的连接后表就自动删除
+	create temporary table tb_temp
+	(
+	   id integer,
+	   name varchar(100),
+	   primary key(id)
+	);
+
+13、删除表
+	drop table tableName;
+
+14、修改表(删除列、增加列、修改列、修改表名)
+	alter table tableName drop name;    --删除tableName表中的name列
+	alter table tableName change name newName dataType;     --修改tableName表中的列
+	alter tableName add  name varchar(200) not null default 'helloword';  --向tableName表中添加name列
+	alter table tableName rename to newTableName ;  --修改表名
+15、DML语句(select 、insert、update、delete)
+
+	select column1,column2…… from tableName;    --查询表tableName 中的column1、……数据
+	select * from tableName;    --查询表tableName中的所有字段信息
+	insert into tableName (column1,column2) values(value1,value2);   --向表tableName中插入column1、column2字段数据	
+	update tableName set column1=value1,column2=value2 where conditions;  --更新tableName表中符合conditions条件的记录中的column1字段值为value1，column2字段值为value2
+	delete from tableName where conditions;   --删除tableName表中符合条件conditions的记录
+	delete from tableName;   --删除tableName表中的所有记录
+
+16、创建、删除、授权用户
+	create user username1;   --创建用户usernname1
+	grant all privileges on DBName.* to username1@'% ' identified by 'password123' with grant option;
+		--授权用户username1仅能访问数据库DBName下的所有数据表，密码为password123
+	drop user username1; --删除用户username1
+
+17、批量执行sql语句
+	可以将sql语句写在一个sql格式的脚本文件中，使用批量的方式执行，脚本中的sql语句通过";"分隔，"--"后是注释
+	使用命令source filename.sql 或反斜杠"\. filename.sql" 在控制台批量执行sql语句
+    mysql -h myhost -u root -p database < sql.txt （sql.txt中包含sql语句）
+
+18 、修改mysql用户密码(下面三种方式都通过验证)
+	①在cmd中执行如下命令即可
+	mysqladmin -uroot -p password '你的新密码' 
+	eg. mysqladmin -u root -p password root  --将用户root的密码改为root,最后要求输入原密码。
+	②在mysql命令行中执行如下语句
+	mysql>  SET PASSWORD FOR root@"%" = PASSWORD('mysql');
+	③直接在数据库中修改记录
+	mysql> use mysql
+	mysql> update user set password = password("new_password") where user = "user_name";
+	mysql> flush privileges;
+
+19、设置mysql编码:
+    1.  SET NAMES 'utf8'
+    它相当于下面的三句指令： 
+    SET character_set_client = utf8; 
+    SET character_set_results = utf8; 
+    SET character_set_connection = utf8; 
+
+    2. 创建数据库 
+    mysql> create database name character set utf8; 
+
+    3. 修改数据库成utf8的.
+    mysql> alter database name character set utf8; 
+
+    4. 修改表默认用utf8.
+    mysql> alter table type character set utf8; 
+
+
+20、mysql自增字段设置
+    alter table album change ALBUM_ID ALBUM_ID bigint not null auto_increment;
+    alter table album auto_increment=1;
+    创建:
+    mysql>create table cc(id int auto_increment,name varchar(20),primary key(id));
+    修改:
+    mysql> alter table cc change id id int primary key auto_increment;
+    注:只有int类型且为primary key 才可以使用auto_increment.
+    如果用hibernate作为持久层,那么主键ID处用identity类型.
+    21、mysql的驱动名称及URL
+    DRIVER: com.mysql.jdbc.Driver
+    URL: jdbc:mysql://localhost:3306/DBNAME?useUnicode=true&characterEncoding=UTF-8
+    USERNAME: root	 
+    PASSWORD: root
+
+21、记录 创建时间和修改时间 字段
+    1、将字段类型设为  TIMESTAMP 
+    2、将默认值设为  CURRENT_TIMESTAMP
+    
+    举例应用：
+    --------------------------------------------------------------------------------
+    
+    1、MySQL 脚本实现用例
+    --添加CreateTime 设置默认时间 CURRENT_TIMESTAMP 
+    ALTER TABLE `table_name`
+    ADD COLUMN  `CreateTime` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间' ;
+    
+    --修改CreateTime 设置默认时间 CURRENT_TIMESTAMP 
+    ALTER TABLE `table_name`
+    MODIFY COLUMN  `CreateTime` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间' ;
+    
+    --添加UpdateTime 设置 默认时间 CURRENT_TIMESTAMP   设置更新时间为 ON UPDATE CURRENT_TIMESTAMP 
+    ALTER TABLE `table_name`
+    ADD COLUMN `UpdateTime` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间' ;
+    
+    --修改 UpdateTime 设置 默认时间 CURRENT_TIMESTAMP   设置更新时间为 ON UPDATE CURRENT_TIMESTAMP 
+    ALTER TABLE `table_name`
+    MODIFY COLUMN `UpdateTime` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATECURRENT_TIMESTAMP COMMENT '创建时间' ;
