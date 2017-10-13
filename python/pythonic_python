@@ -1,0 +1,152 @@
+切片操作：
+    s = "abcdefg"
+    # 第1到第4个元素的范围区间
+        s[1:4]
+        输出： "bcd"
+
+    # 奇数
+        s[1::2]
+        输出： "bdf"
+
+    #拷贝
+        s[::] 或者 s[:]
+
+    #反转
+        s[::-1]
+        输出： 'gfedcba'
+
+re 用法：
+    import re
+    s = "1234567890"
+    re.findall(r".{1,3}",s)
+    输出：['123', '456', '789', '0']
+
+map,filter,reduce,lambda
+    reduce()的用法：把一个函数（这个函数必须是两个参数）作用在一个序列上，这个函数必须接收两个参数，reduce把结果继续和序列的下一个元素做累积计算。
+    reduce(func, list)
+
+    map()接收两个参数，一个是函数（这个函数可以有多个参数至少一个，参数个数必须和后面的序列参数个数一致，且每个序列必须等长），一个是序列，map将传人的函数依次作用到序列的每个元素，并把结果作为新的list返回。
+        map(lambda x, y, z, k : x+y+z+k,[1,2,3,4],[1,72,35,4],[1,2,3,4],[1,72,35,4])
+        输出：[4, 148, 76, 16]
+
+    filter()是‘筛选函数’，也接收一个函数和一个序列，filter()把传人的函数依次作用于序列的每个元素，然后根据返回值是True还是false决定保留还是丢弃该元素
+
+    lambda命名函数，用法很多：
+        late binding: 这意味着在闭包中的变量是在内部函数被调用的时候被查找，如下
+        def multi():
+            return [lambda x: x * i for i in range(4)]  这边返回的四个函数变量i都未被赋值，当调用时再去作用域中查找i的值，那时所有的i全是3。
+        print [m(2) for m in multi()]
+        以上输出：[6, 6, 6, 6]
+
+        要得到四个不同的函数，先给i赋值，如下
+        def multi():
+            return [lambda x, i=i: x * i for i in range(4)]
+        print [m(2) for m in multi()]
+        输出：[0, 2, 4, 6]
+
+__slots__
+    默认情况下，Python 用一个字典来保存一个对象的实例属性。这使得我们可以在运行的时候动态的给类的实例添加新的属性：
+
+    test = Test()
+    test.new_key = 'new_value'
+    然而这个字典浪费了多余的空间 — 很多时候我们不会创建那么多的属性。因此通过__slots__可以告诉 Python 不要使用字典而是固定集合来分配空间。
+    class Test(object):
+        # 用列表罗列所有的属性
+        __slots__ = ['name', 'value']
+        def __init__(self, name='test', value='0'):
+            self.name = name
+            self.value = value
+    test = Test()
+    # 此时再增加新的属性则会报错
+    test.new_key = 'new_value'
+    # AttributeError: 'Test' object has no attribute 'new_key'
+
+__call__
+    通过定义类中的__call__方法，可以使该类的实例能够像普通函数一样调用。
+    class AddNumber(object):
+        def __init__(self):
+            self.num = 0
+     
+        def __call__(self, num=1):
+            self.num += num
+    add_number = AddNumber()
+    print(add_number.num) # 0
+    add_number() # 像方法一样的调用
+    print(add_number.num) # 1
+    add_number(3)
+    print(add_number.num) # 4
+
+    通过这种方式实现的好处是，可以通过类的属性来保存状态，而不必创建一个闭包或者全局变量。
+
+@classmethod & @staticmethod
+    # 在 Date 内新增一个 classmethod
+    @classmethod
+    def from_string(cls, string):
+        year, month, day = map(str, string.split('-'))
+        # 在 classmethod 内可以通过 cls 来调用到类的方法，甚至创建实例
+        date = cls(year, month, day)
+        return date
+
+    这样，我们就可以通过Date类来调用from_string方法创建实例，并且不侵略、修改旧的实例化方式：
+    date = Date.from_string('2016-11-09')
+    # 旧的实例化方式仍可以使用
+    date_old = Date('2016', '11', '09')
+
+    好处：
+      ● 在@classmethod内，可以通过cls参数，获取到跟外部调用类时一样的便利
+      ● 可以在其中进一步封装该方法，提高复用性
+      ● 更加符合面向对象的编程方式
+
+    而@staticmethod，因为其本身类似于普通的函数，所以可以把和这个类相关的 helper 方法作为@staticmethod，放在类里，然后直接通过类来调用这个方法。
+
+
+创建上下文管理器
+
+    上下文管理器，通俗的介绍就是：在代码块执行前，先进行准备工作；在代码块执行完成后，做收尾的处理工作。with语句常伴随上下文管理器一起出现，经典场景有：
+
+    with open('test.txt', 'r') as file:
+        for line in file.readlines():
+            print(line)
+
+    通过with语句，代码完成了文件打开操作，并在调用结束，或者读取发生异常时自动关闭文件，即完成了文件读写之后的处理工作。如果不通过上下文管理器的话，则会是这样的代码：
+
+    file = open('test.txt', 'r')
+    try:
+        for line in file.readlines():
+            print(line)
+    finally:
+        file.close()
+
+    比较繁琐吧？所以说使用上下文管理器的好处就是，通过调用我们预先设置好的回调，自动帮我们处理代码块开始执行和执行完毕时的工作。而通过自定义类的__enter__和__exit__方法，我们可以自定义一个上下文管理器。
+
+    class ReadFile(object):
+        def __init__(self, filename):
+            self.file = open(filename, 'r')
+        
+        def __enter__(self):
+            return self.file
+        
+        def __exit__(self, type, value, traceback):
+            # type, value, traceback 分别代表错误的类型、值、追踪栈
+            self.file.close()
+            # 返回 True 代表不抛出错误
+            # 否则错误会被 with 语句抛出
+            return True
+
+    然后可以以这样的方式进行调用：
+
+    with ReadFile('test.txt') as file_read:
+        for line in file_read.readlines():
+            print(line)
+
+    在调用的时候：
+
+      1. with语句先暂存了ReadFile类的__exit__方法
+      2. 然后调用ReadFile类的__enter__方法
+      3. __enter__方法打开文件，并将结果返回给with语句
+      4. 上一步的结果被传递给file_read参数
+      5. 在with语句内对file_read参数进行操作，读取每一行
+      6. 读取完成之后，with语句调用之前暂存的__exit__方法
+      7. __exit__方法关闭了文件
+
+    要注意的是，在__exit__方法内，我们关闭了文件，但最后返回True，所以错误不会被with语句抛出。否则with语句会抛出一个对应的错误。

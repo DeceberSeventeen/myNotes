@@ -1,0 +1,18 @@
+location proxy_pass 的访问：
+    用http://192.168.1.4/proxy/test.html 进行访问。
+
+    第一种：
+
+    location  /proxy/ {
+        proxy_pass http://127.0.0.1:81/;
+    }
+
+    会被代理到http://127.0.0.1:81/test.html 这个url
+
+    第二咱(相对于第一种，最后少一个 /)
+
+    location  /proxy/ {
+        proxy_pass http://127.0.0.1:81;
+    }
+
+    会被代理到http://127.0.0.1:81/proxy/test.html 这个url
