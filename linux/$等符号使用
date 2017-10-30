@@ -1,0 +1,8 @@
+$符号
+    ${param} 变量值
+    ${#param} 返回变量的长度（按字符计算）
+    ${param:offset} 从offset之后开始提取到结尾，${param:offset:length} 从offset之后开始提取length长度
+    ${param#word} 删除匹配word的最短的字符串，${param##word} 最长的 从头开始
+    ${param%word} 删除匹配word的最短的字符串，${param%%word} 最长的 从尾向前
+    ${param/旧/新} 替换第一个匹配的字符串 ${param//旧/新} 替换全部匹配的字符串
+

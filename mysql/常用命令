@@ -125,7 +125,7 @@
     举例应用：
     --------------------------------------------------------------------------------
     
-    1、MySQL 脚本实现用例
+    3.MySQL 脚本实现用例
     --添加CreateTime 设置默认时间 CURRENT_TIMESTAMP 
     ALTER TABLE `table_name`
     ADD COLUMN  `CreateTime` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间' ;

@@ -16,3 +16,27 @@ location proxy_pass 的访问：
     }
 
     会被代理到http://127.0.0.1:81/proxy/test.html 这个url
+
+nginx 静态文件反问：
+    直接显示文本文件：
+        例：访问  *.plist 文件
+        方法一：
+            修改好mime.types类型后，直接重启nginx即可。这个方法修改后影响所有nginx网站的配置。
+            text/plain                            plist;
+
+        方法二：
+
+            单独打开某个网站的配置文件，在server中修改，例如我让某个网站ios目录下的plist文件显示为text/plain格式。
+
+            location ~ .*/ios/.*\.plist$ {
+                add_header Content-Type text/plain;
+            }
+            让某个目录下的文件都显示为text/plain格式。
+
+            # Target code
+            location /code/ {
+                # All files in it
+                location ~* {
+                    add_header Content-Type text/plain;
+                }
+            }
