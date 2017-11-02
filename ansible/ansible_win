@@ -1,0 +1,52 @@
+主控机： linux
+    安装ansible，在/etc/ansible/hosts中添加被控机（windows）的ip
+        [windows]
+        10.11.33.13 ansible_ssh_user="lin.yang323" ansible_ssh_pass="Yl123456" ansible_ssh_port=5985 ansible_connection="winrm" ansible_winrm_server_cert_validation=ignore
+    安装Python Winrm：pip install pywinrm
+
+被控机：windows
+    为避免不必要的麻烦请用本机的Administrator账户，不要用域账号。
+        Administrator@RSMYJDT0062 123QWEasd
+    安装Framework 3.0+
+    升级powershell version 3.0
+        powershell运行：upgrade_to_ps3.ps1
+        powershell终端运行：get-host (查看版本)
+    更改powershell 权限策略为remotesigned
+        powershell终端运行：set-executionpolicy remotesigned
+
+    设置Windows远端管理（WS-Management，WinRM）下载补丁脚本:
+        ConfigureRemotingForAnsible.ps1右击后选择“使用PowerShell运行”，执行结果没有返回错误即为正常
+
+    如执行出现“由于此计算机上的网络连接类型之一设置为公用，因此 WinRM防火墙例外将不运行”类似报错，请在PowerShell中执行命令Enable-PSRemoting – SkipNetworkProfileCheck –Force尝试解决。
+
+    运行和关闭winrm：
+        disable-psremoting
+        enable-psremoting
+
+    查看winrm是否运行：
+        winrm quickconfig或winrm qc
+
+    设置允许运行ps脚本：
+        set-executionpolicy -executionpolicy unrestricted
+
+    winrm service 默认都是未启用的状态，先查看状态；如无返回信息，则是没有启动；
+        winrm enumerate winrm/config/listener或winrm e winrm/config/listener
+
+    为winrm service 配置auth:
+        winrm set winrm/config/service/auth '@{Basic="true"}'
+
+    为winrm service 配置加密方式为允许非加密：
+        winrm set winrm/config/service '@{AllowUnencrypted="true"}'
+
+    添加连接的用户：
+        winrm configSDDL default
+
+
+
+
+
+
+
+
+
+
