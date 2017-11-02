@@ -159,10 +159,12 @@ awk 数据流处理工具
     print 打印当前行
     使用不带参数的print时，会打印当前行;
       echo -e "line1\nline2" | awk 'BEGIN{print "start"} {print } END{ print "End" }' 
-    print 以逗号分割时，参数以空格定界;
-    echo | awk ' {var1 = "v1" ; var2 = "V2"; var3="v3"; \ print var1, var2 , var3; }'$>v1 V2 v3
+    声明变量：
+        awk -v year=2013 -v month=04 '$2 ~ year"/"month"/[0123]" {print $2,$3,$NF}'
+        使用外部shell变量：
+            name="sni7"
+            awk  -v var=${name} 'BEGIN{print var}'
     使用-拼接符的方式（""作为拼接符）;
-    echo | awk ' {var1 = "v1" ; var2 = "V2"; var3="v3"; \ print var1"-"var2"-"var3; }'$>v1-V2-v3
     特殊变量： NR NF $0 $1 $2
     NR:表示记录数量，在执行过程中对应当前行号；
     NF:表示字段数量，在执行过程总对应当前行的字段数；
